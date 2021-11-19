@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: consumer
+  labels:
+    app: simpleflask
+    role: consumer
+spec:
+#  type: NodePort
+#  ports:
+#  - port: 5000
+#    nodePort: 30001
+#    protocol: TCP
+  type: ClusterIP
+  ports:
+  - targetPort: 80
+    port: 80
+  selector:
+    app: simpleflask
+    role: consumer
