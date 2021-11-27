@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: hwcm
+data:
+  K8SVER: "1.22.3"
+  K8SOS: "centos"
+  main.conf: |
+    #main.conf
+    name=homework
+    path=/tmp
+    certs=/secret
+  port.conf: |
+    8080

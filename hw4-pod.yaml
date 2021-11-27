@@ -1,0 +1,46 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-cm-env-vars
+  labels:
+    app: environ
+spec:
+  containers:
+    - image: shekeriev/k8s-environ 
+      name: cont-w-env
+      volumeMounts:
+        - name: hwvl
+          mountPath: "/config"
+          readOnly: true
+        - name: hwlvsc
+          mountPath: "/secret"
+          readOnly: true
+      envFrom:
+      - configMapRef:
+          name: hwcm
+        prefix: HW_
+      env:
+      - name: HW_PORT
+        valueFrom:
+          configMapKeyRef:
+            name: hwcm
+            key: port.conf
+  volumes:
+    - name: hwvl
+      configMap:
+        name: hwcm
+        items:
+        - key: "main.conf"
+          path: "main.conf"
+    - name: hwlvsc
+      secret:
+        secretName: hwsec
+        items:
+        - key: "main.crt"
+          path: "main.crt"
+          mode: 0777
+        - key: "main.key"
+          path: "main.key"
+          mode: 0777
+
+        
