@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: facts-fe
+spec:
+  replicas: 3
+  selector:
+    matchLabels: 
+      app: facts-fe
+      role: fe
+  minReadySeconds: 15
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1
+  template:
+    metadata:
+      labels:
+        app: facts-fe
+        role: fe
+    spec:
+      containers:
+      - name: facts-fe
+        image: shekeriev/k8s-facts-fe
+        ports:
+        - containerPort: 5000
+        env:
+        - name: FACTS_SERVER
+          value: "svc-be"
+        - name: FACTS_PORT
+          value: "5000"
