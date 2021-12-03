@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: consumer-deploy
 spec:
-  replicas: 20
+  replicas: 5
   selector:
     matchLabels: 
       app: simpleflask
