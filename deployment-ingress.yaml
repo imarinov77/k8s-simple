@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web-one
+  labels:
+    app: web-one
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: web-one
+  template:
+    metadata:
+      labels:
+        app: web-one
+    spec:
+      containers:
+      - name: web-one
+        image: httpd
+        ports:
+        - containerPort: 80
+
