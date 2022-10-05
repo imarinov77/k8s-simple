@@ -1,0 +1,61 @@
+#create user
+sudo useradd -s /bin/bash bob
+
+#generate key
+openssl genrsa -out bob.key 2048
+
+#generate csr
+openssl req -new -key bob.key -out bob.csr -subj "/CN=bob/O=development"
+
+#generate a self-signed certificate
+sudo openssl x509 -req -in bob.csr -CA /etc/kubernetes/pki/ca.crt -CAkey /etc/kubernetes/pki/ca.key -CAcreateserial -out bob.crt -days 45
+
+#create new user context
+kubectl config set-credentials bob --client-certificate=./bob.crt --client-key=./bob.key
+kubectl config set-context bob-context --cluster=kubernetes --namespace=development --user=bob
+
+#test permisions - expected Forbidden
+kubectl --context=bob-context get pods - (Forbidden)
+
+#Create role. Namespace will be default
+
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: bob
+  #namespace: #Can be set  
+rules:
+- apiGroups: ["", "extensions", "apps"]
+  resources: ["pods"]
+  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"] # You can also use ["*"]
+
+#Create rolebinding 
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: bob-role-binding
+  #namespace: development
+subjects:
+- kind: User
+  name: bob
+  apiGroup: ""
+roleRef:
+  kind: Role
+  name: bob
+  apiGroup: ""
+
+#test 
+kubectl --context=bob-context get pods
+kubectl --context=bob-context run  pod nginx --image=nginx
+
+#switch between contexts
+
+kubectl config get-contexts
+CURRENT   NAME                          CLUSTER      AUTHINFO           NAMESPACE
+          bob-context                   kubernetes   bob
+*         kubernetes-admin@kubernetes   kubernetes   kubernetes-admin
+
+kubectl config use-context bob-context
+Switched to context "bob-context".
+kubectl get nodes
+Error from server (Forbidden): nodes is forbidden: User "bob" cannot list resource "nodes" in API group "" at the cluster scope

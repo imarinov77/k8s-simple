@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: simpleflask-pod
+  labels:
+    app: simpleflask
+    role: consumer
+spec:
+  containers:
+  - name: simpleflask-container
+    image: imarinov77/simpleflask:latest
+    ports:
+    - containerPort: 80
